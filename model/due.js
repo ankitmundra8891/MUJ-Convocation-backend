@@ -16,6 +16,10 @@ const DueSchema = new Schema({
     },
     details:{
         type:String
+    },
+    is_clear:{
+        type:Boolean,
+        default:false
     }
 },{timestamps:true});
 
