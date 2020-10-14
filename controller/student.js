@@ -97,6 +97,7 @@ exports.createStudent = (req, res, next) => {
     cgpa,
     remark,
   } = req.body;
+
   const student = new Student({
     faculty,
     school,
