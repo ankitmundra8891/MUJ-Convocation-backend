@@ -21,7 +21,7 @@ const StudentSchma = new Schema({
     reg_no:{
         type: Number,
         required: true,
-        maxlength: 9
+        maxlength: 11
     },
     student_name:{
         type: String,
@@ -30,7 +30,7 @@ const StudentSchma = new Schema({
     gender:{
         type: String,
         required: true,
-        maxlength: 1
+        maxlength: 11
     },
     batch:{
         type: Number,
@@ -50,7 +50,7 @@ const StudentSchma = new Schema({
     is_paid:{
         type: Boolean,
         default: false
-    }
+    },
 },{timestamps:true});
 
 module.exports = mongoose.model('Student', StudentSchma);
