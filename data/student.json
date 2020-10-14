@@ -1,0 +1,131 @@
+
+[
+
+            {
+                   
+                    "faculty": "Faculty of Engineering",
+                    "school": "School of Computing and IT",
+                    "programme": "Bachelor of Technology",
+                    "specialization": "Computer Science and Engineering",
+                    "reg_no": 161320102,
+                    "student_name": "Harish Sharma",
+                    "gender": "M",
+                    "batch": 2016,
+                    "credits": 150,
+                    "cgpa": 5.526666666666666,
+                    "email":"pranav280300@gmail.com"
+            },
+            {
+                 
+                    "faculty": "Faculty of Arts & Law",
+                    "school": "SCHOOL OF JOURNALISM & MASS COMMUNICATION",
+                    "programme": "Bachelor of Arts",
+                    "specialization": "Journalism & Mass Communication",
+                    "reg_no": 661311012,
+                    "student_name": "Ayush",
+                    "gender": "M",
+                    "batch": 2016,
+                    "credits": 150,
+                    "cgpa": 6.43,
+                    "email":"pranav280300@gmail.com"
+            },
+            {
+                    
+                    "faculty": "Faculty of Arts & Law",
+                    "school": "SCHOOL OF JOURNALISM & MASS COMMUNICATION",
+                    "programme": "Bachelor of Arts",
+                    "specialization": "Journalism & Mass Communication",
+                    "reg_no": 161301054,
+                    "student_name": "Kumar Gaurav",
+                    "gender": "reg_no",
+                    "batch": 2016,
+                    "credits": 150,
+                    "cgpa": 7.82,
+                    "email":"pranav280300@gmail.com"
+            },
+            {
+                    
+                    "faculty": "Faculty of Engineering",
+                    "school": "School of Computing and IT",
+                    "programme": "Bachelor of Technology",
+                    "specialization": "Information Technology",
+                    "reg_no": 161301062,
+                    "student_name": "Rajan Kumar",
+                    "gender": "M",
+                    "batch": 2016,
+                    "credits": 150,
+                    "cgpa": 5.48,
+                    "email":"pranav280300@gmail.com"
+            },
+            {
+                    
+                    "faculty": "Faculty of Engineering",
+                    "school": "School of Computing and IT",
+                    "programme": "Bachelor of Technology",
+                    "specialization": "Information Technology",
+                    "reg_no": 175601001,
+                    "student_name": "Ayushi",
+                    "gender": "reg_no",
+                    "batch": 2017,
+                    "credits": 150,
+                    "cgpa": 6.3934,
+                    "email":"pranav280300@gmail.com"
+            },
+            {
+                    
+                    "faculty": "Faculty of Arts & Law",
+                    "school": "SCHOOL OF JOURNALISM & MASS COMMUNICATION",
+                    "programme": "Bachelor of Arts",
+                    "specialization": "Journalism & Mass Communication",
+                    "reg_no": 171201045,
+                    "student_name": "Maulik",
+                    "gender": "M",
+                    "batch": 2017,
+                    "credits": 150,
+                    "cgpa": 7.08,
+                    "email":"pranav280300@gmail.com"
+            },
+            {
+                    
+                    "faculty": "Faculty of Engineering",
+                    "school": "School of Computing and IT",
+                    "programme": "Bachelor of Technology",
+                    "specialization": "Information Technology",
+                    "reg_no": 145201004,
+                    "student_name": "Yash Kumar",
+                    "gender": "reg_no",
+                    "batch": 2017,
+                    "credits": 150,
+                    "cgpa": 8.16,
+                    "email":"pranav280300@gmail.com"
+            },
+            {
+                    
+                    "faculty": "Faculty of Arts & Law",
+                    "school": "SCHOOL OF JOURNALISM & MASS COMMUNICATION",
+                    "programme": "Bachelor of Arts",
+                    "specialization": "Journalism & Mass Communication",
+                    "reg_no": 189201007,
+                    "student_name": "APOORV Gupta",
+                    "gender": "M",
+                    "batch": 2017,
+                    "credits": 150,
+                    "cgpa": 7.0867,
+                    "email":"pranav280300@gmail.com"
+            },
+            {
+                    
+                    "faculty": "Faculty of Engineering",
+                    "school": "School of Computing and IT",
+                    "programme": "Bachelor of Technology",
+                    "specialization": "Information Technology",
+                    "reg_no": 171201678,
+                    "student_name": "Ashish Malik",
+                    "gender": "M",
+                    "batch": 2017,
+                    "credits": 150,
+                    "cgpa": 7.8867,
+                    "email":"pranav280300@gmail.com"
+            }
+]
+    
