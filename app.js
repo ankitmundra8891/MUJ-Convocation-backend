@@ -18,7 +18,7 @@ const dueRoute = require('./route/due');
 //App initialization
 const app = express();
 app.use(cors());
-
+app.use(bodyParser.json());
 const fileStorage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, 'images');

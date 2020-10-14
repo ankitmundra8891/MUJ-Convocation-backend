@@ -33,7 +33,7 @@ const StudentSchema = new Schema(
       type: Number,
       required: [true, 'registration number is required'],
       unique: true,
-      maxlength: 9,
+      maxlength: 11,
     },
     student_name: {
       type: String,
@@ -42,7 +42,7 @@ const StudentSchema = new Schema(
     gender: {
       type: String,
       required: [true, 'gender is required'],
-      maxlength: 1,
+      maxlength: 11,
     },
     batch: {
       type: Number,
