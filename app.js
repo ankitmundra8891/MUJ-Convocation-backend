@@ -4,11 +4,14 @@ const mongoose = require('mongoose');
 const cookieParser = require('cookie-parser');
 const path = require('path');
 const multer = require('multer');
+const errorHandler = require('./middleware/error');
 const cors = require('cors');
 const constants = require('./config/dev');
+const morgan = require('morgan');
 const { v4: uuidv4 } = require('uuid');
 
 //App Routes
+const authRoutes = require('./route/auth');
 const studentRoute = require('./route/student');
 const dueRoute = require('./route/due');
 
@@ -38,6 +41,7 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
+app.use(morgan('dev'));
 //App utilities
 app.use(express.static(path.join(__dirname, 'Public')));
 app.use(bodyParser.urlencoded({ extended: false })); //x-www-form-urlencoded
@@ -62,6 +66,7 @@ app.use(
 
 app.use(cookieParser());
 
+app.use('/auth', authRoutes);
 app.use('/student', studentRoute);
 app.use('/due', dueRoute);
 // app.use('/nopandata', noPanDataRoutes);
@@ -76,6 +81,7 @@ app.use((error, req, res, next) => {
   res.status(status).json({ message: message, data: data });
 });
 
+app.use(errorHandler);
 //Mongoose connection
 //LOCAL URL - mongodb://localhost:27017/test
 

@@ -1,56 +1,85 @@
 const mongoose = require('mongoose');
+const { JWT_SECRET } = require('../config/dev');
 const Schema = mongoose.Schema;
 
-const StudentSchma = new Schema({
-    faculty:{
-        type: String,
-        required: true
+const StudentSchema = new Schema(
+  {
+    faculty: {
+      type: String,
+      required: [true, 'faculty is required'],
     },
-    school:{
-        type: String,
-        required: true
+    email: {
+      type: String,
+      required: [true, 'email is required!'],
+      // unique: true,
+      match: [
+        /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
+        'Please enter a valid email',
+      ],
     },
-    programme:{
-        type: String,
-        required: true
+    school: {
+      type: String,
+      required: [true, 'school is required'],
     },
-    specialization:{
-        type: String,
-        required: true
+    programme: {
+      type: String,
+      required: [true, 'program is required'],
     },
-    reg_no:{
-        type: Number,
-        required: true,
-        maxlength: 9
+    specialization: {
+      type: String,
+      required: [true, 'specialization is required'],
     },
-    student_name:{
-        type: String,
-        required: true
+    reg_no: {
+      type: Number,
+      required: [true, 'registration number is required'],
+      unique: true,
+      maxlength: 9,
     },
-    gender:{
-        type: String,
-        required: true,
-        maxlength: 1
+    student_name: {
+      type: String,
+      required: [true, 'student name is required'],
     },
-    batch:{
-        type: Number,
-        required: true
+    gender: {
+      type: String,
+      required: [true, 'gender is required'],
+      maxlength: 1,
     },
-    credits:{
-        type: Number,
-        required: true
+    batch: {
+      type: Number,
+      required: [true, 'batch is requred'],
     },
-    cgpa:{
-        type: String,
-        required: true
+    credits: {
+      type: Number,
+      required: [true, 'credits are required'],
     },
-    remark:{
-        type: String
+    cgpa: {
+      type: String,
+      required: [true, 'cgpa is required'],
     },
-    is_paid:{
-        type: Boolean,
-        default: false
-    }
-},{timestamps:true});
+    remark: {
+      type: String,
+    },
+    is_paid: {
+      type: Boolean,
+      default: false,
+    },
+    password: {
+      type: String,
+    },
+  },
+  { timestamps: true }
+);
 
-module.exports = mongoose.model('Student', StudentSchma);
+// Sign JWT and return
+StudentSchema.methods.getSignedJwtToken = function () {
+  return jwt.sign({ id: this._id }, JWT_SECRET, {
+    expiresIn: 36000,
+  });
+};
+
+// Match user entered password to hashed password in database
+StudentSchema.methods.matchPassword = async function (enteredPassword) {
+  return await bcrypt.compare(enteredPassword, this.password);
+};
+
+module.exports = mongoose.model('Student', StudentSchema);
