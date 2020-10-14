@@ -63,3 +63,24 @@ exports.deleteStudentByRegAndDept=(req,res,next)=>{
         next(err);
     });
 }
+
+exports.clearStudentDue = (req,res,next) =>{
+    const id = req.params.id;
+    Due.findById(id).then((student)=>{
+        if (!student) {
+            const error = new Error('Could not find student.');
+            error.status = 404;
+            throw error;
+        }
+        student.is_clear=true;
+        return student.save();
+    }).then((result) => {
+        res.status(200).send({ message: "Student due paid successfully!", student: result });
+    })
+    .catch(error => {
+        if (!error.statusCode) {
+            error.statusCode = 500;
+        }
+        next(error);
+    })
+}
