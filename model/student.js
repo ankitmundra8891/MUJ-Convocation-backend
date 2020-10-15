@@ -89,6 +89,10 @@ const StudentSchema = new Schema(
     pincode: {
       type: Number,
     },
+    role: {
+      enum: ['student', 'department', 'admin'],
+      default: 'student',
+    },
   },
   { timestamps: true }
 );

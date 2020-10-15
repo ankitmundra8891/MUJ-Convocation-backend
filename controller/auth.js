@@ -13,11 +13,23 @@ const { JWT_COOKIE_EXPIRE } = require('../config/dev');
 // @access PUBLIC
 
 module.exports.registerUser = asyncHandler(async (req, res, next) => {
-  const { reg_no } = req.body;
-  const user = await Student.findOne({ reg_no });
-  if (!user) {
-    next(new ErrorResponse('No student found', 404));
+  const role = req.body.role;
+  let user;
+  if (role === 'student') {
+    const { reg_no } = req.body;
+    user = await Student.findOne({ reg_no });
+    if (!user) {
+      next(new ErrorResponse('No student found', 404));
+    }
+  } else if (role === 'department') {
+    const { email } = req.body;
+    // user = await Department.findOne({ email });
+    user = await Student.findOne({ reg_no });
+    if (!user) {
+      next(new ErrorResponse('No department found', 404));
+    }
   }
+
   if (user && user.password) {
     next(new ErrorResponse('You have already registered, please login', 404));
   } else {
@@ -51,17 +63,30 @@ module.exports.registerUser = asyncHandler(async (req, res, next) => {
 
 module.exports.loginUser = asyncHandler(async (req, res, next) => {
   try {
-    const { reg_no, password } = req.body;
-    // Validate regNo & password
-    if (!reg_no || !password) {
-      return next(
-        new ErrorResponse('Please provide an reg_no and password', 400)
-      );
-    }
+    const role = req.body.role;
+    let user;
+    if (role === 'student') {
+      const { reg_no, password } = req.body;
+      // Validate regNo & password
+      if (!reg_no || !password) {
+        return next(
+          new ErrorResponse('Please provide an reg_no and password', 400)
+        );
+      }
+      user = await Student.findOne({
+        reg_no,
+      }).select('+password');
+    } else if (role === 'department') {
+      const { email, password } = req.body;
 
-    let user = await Student.findOne({
-      reg_no,
-    }).select('+password');
+      if (!email || !password) {
+        return next(
+          new ErrorResponse('Please provide an reg_no and password', 400)
+        );
+      }
+      user = await Student.findOne({ reg_no });
+      // user = await Department.findOne({ email }).select('+password');
+    }
 
     if (!user) {
       return next(
