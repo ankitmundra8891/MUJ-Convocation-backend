@@ -1,7 +1,8 @@
 const jwt = require('jsonwebtoken');
 const asyncHandler = require('./async');
 const ErrorResponse = require('../utils/errorResponse');
-const User = require('../model/student');
+const Student = require('../model/student');
+const Department = require('../model/department');
 const { JWT_SECRET } = require('../config/dev');
 
 // Protect routes
@@ -31,15 +32,15 @@ exports.protect = asyncHandler(async (req, res, next) => {
     // get the payload from the jwt
     // find the corresponding user in the database
     // set the req.user to the user object returned by the database
-    // let user;
-    // let student = await Student.findById(decoded.id);
-    // let department = await Department.findById(decoded.id);
-    // if (student) {
-    //   user = student;
-    // } else if (department) {
-    //   user=department
-    // }
-    const user = await User.findById(decoded.id);
+    let user;
+    let student = await Student.findById(decoded.id);
+    let department = await Department.findById(decoded.id);
+    if (student) {
+      user = student;
+    } else if (department) {
+      user = department;
+    }
+    // const user = await User.findById(decoded.id);
 
     req.user = user;
 

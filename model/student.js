@@ -89,7 +89,26 @@ const StudentSchema = new Schema(
     pincode: {
       type: Number,
     },
+    account_holder_name: {
+      type: String,
+    },
+    bank_address: {
+      type: String,
+    },
+    account_number: {
+      type: String,
+    },
+    bank_name: {
+      type: String,
+    },
+    branch_name: {
+      type: String,
+    },
+    ifsc_code: {
+      type: String,
+    },
     role: {
+      type: String,
       enum: ['student', 'department', 'admin'],
       default: 'student',
     },

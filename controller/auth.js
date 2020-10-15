@@ -6,6 +6,7 @@ const crypto = require('crypto');
 const sendEmail = require('../utils/sendEmail');
 const bcrypt = require('bcryptjs');
 const Due = require('../model/due');
+const Department = require('../model/department');
 const { JWT_COOKIE_EXPIRE } = require('../config/dev');
 
 // @desc register user
@@ -21,34 +22,55 @@ module.exports.registerUser = asyncHandler(async (req, res, next) => {
     if (!user) {
       next(new ErrorResponse('No student found', 404));
     }
-  } else if (role === 'department') {
-    const { email } = req.body;
-    // user = await Department.findOne({ email });
-    user = await Student.findOne({ reg_no });
-    if (!user) {
-      next(new ErrorResponse('No department found', 404));
+    if (user && user.password) {
+      next(new ErrorResponse('This user already exists, please login', 404));
+    } else {
+      const genreatedPassword = crypto.randomBytes(8).toString('hex');
+
+      const salt = await bcrypt.genSalt(10);
+      user.password = await bcrypt.hash(genreatedPassword, salt);
+
+      await user.save();
+
+      const message = `Your password for login is ${genreatedPassword}`;
+      await sendEmail({
+        email: user.email,
+        subject: 'Your password',
+        message,
+      });
     }
-  }
+  } else if (role === 'department') {
+    const { email, department, password, role } = req.body;
+    user = await Department.create({ email, department, password, role });
 
-  if (user && user.password) {
-    next(new ErrorResponse('You have already registered, please login', 404));
-  } else {
-    const genreatedPassword = crypto.randomBytes(8).toString('hex');
-
-    const salt = await bcrypt.genSalt(10);
-    user.password = await bcrypt.hash(genreatedPassword, salt);
-
-    await user.save();
-
-    const message = `Your password for login is ${genreatedPassword}`;
+    // user = await Student.findOne({ reg_no });
+    // if (!user) {
+    //   next(new ErrorResponse('No department found', 404));
+    // }
+    const message = `Your password for login is ${password}`;
+    console.log('wkjbsb');
     await sendEmail({
       email: user.email,
       subject: 'Your password',
       message,
     });
-    sendTokenResponse(user, 200, res);
-  }
+  } else if (role === 'admin') {
+    const { email, department, password, role } = req.body;
+    user = await Department.create({ email, department, password, role });
 
+    // user = await Student.findOne({ reg_no });
+    // if (!user) {
+    //   next(new ErrorResponse('No department found', 404));
+    // }
+    const message = `Your password for login is ${password}`;
+    console.log('wkjbsb');
+    await sendEmail({
+      email: user.email,
+      subject: 'Your password',
+      message,
+    });
+  }
+  sendTokenResponse(user, 200, res);
   // const user = await User.create({
   //   name,
   //   email,
@@ -63,6 +85,7 @@ module.exports.registerUser = asyncHandler(async (req, res, next) => {
 
 module.exports.loginUser = asyncHandler(async (req, res, next) => {
   try {
+    let matchingPassword;
     const role = req.body.role;
     let user;
     if (role === 'student') {
@@ -76,6 +99,7 @@ module.exports.loginUser = asyncHandler(async (req, res, next) => {
       user = await Student.findOne({
         reg_no,
       }).select('+password');
+      matchingPassword = password;
     } else if (role === 'department') {
       const { email, password } = req.body;
 
@@ -84,8 +108,20 @@ module.exports.loginUser = asyncHandler(async (req, res, next) => {
           new ErrorResponse('Please provide an reg_no and password', 400)
         );
       }
-      user = await Student.findOne({ reg_no });
-      // user = await Department.findOne({ email }).select('+password');
+
+      user = await Department.findOne({ email }).select('+password');
+      matchingPassword = password;
+    } else {
+      const { email, password } = req.body;
+
+      if (!email || !password) {
+        return next(
+          new ErrorResponse('Please provide an reg_no and password', 400)
+        );
+      }
+
+      user = await Department.findOne({ email }).select('+password');
+      matchingPassword = password;
     }
 
     if (!user) {
@@ -103,31 +139,34 @@ module.exports.loginUser = asyncHandler(async (req, res, next) => {
     // *
 
     // Check if password matches
-    const isMatch = await user.matchPassword(password);
+    const isMatch = await user.matchPassword(matchingPassword);
 
     if (!isMatch) {
       return next(new ErrorResponse('Invalid credentials', 401));
     }
-    const due = await Due.find({ reg_no });
-    let message = `Please clear your dues for`;
-    for (d of due) {
-      message =
-        message + `\n${d.department} - Rs.${d.amount_due} - ${d.details}\n`;
-    }
+    if (user.role === 'student') {
+      const { reg_no } = req.body;
+      const due = await Due.find({ reg_no });
+      let message = `Please clear your dues for`;
+      for (d of due) {
+        message =
+          message + `\n${d.department} - Rs.${d.amount_due} - ${d.details}\n`;
+      }
 
-    if (due.length > 0) {
-      console.log(due);
-      await sendEmail({
-        email: user.email,
-        subject: 'Your dues',
-        message,
-      });
-      return next(
-        new ErrorResponse(
-          'Please clear your dues first,please check your mail for due details ',
-          401
-        )
-      );
+      if (due.length > 0) {
+        console.log(due);
+        await sendEmail({
+          email: user.email,
+          subject: 'Your dues',
+          message,
+        });
+        return next(
+          new ErrorResponse(
+            'Please clear your dues first,please check your mail for due details ',
+            401
+          )
+        );
+      }
     }
     sendTokenResponse(user, 200, res);
   } catch (err) {
@@ -141,7 +180,14 @@ module.exports.loginUser = asyncHandler(async (req, res, next) => {
 
 exports.getUserAfterLogin = asyncHandler(async (req, res, next) => {
   // getting user based on id of jwt token from header and as we don't want password we neglect it  using select('-password')
-  let user = await Student.findById(req.user._id).select('-password');
+  let user;
+  let student = await Student.findById(req.user._id);
+  let department = await Department.findById(req.user._id);
+  if (student) {
+    user = student;
+  } else if (department) {
+    user = department;
+  }
 
   if (!user) {
     next(new ErrorResponse('User not found!', 404));
