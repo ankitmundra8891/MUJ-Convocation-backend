@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
 const { JWT_SECRET } = require('../config/dev');
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
 const Schema = mongoose.Schema;
 
 const StudentSchema = new Schema(
@@ -65,6 +67,27 @@ const StudentSchema = new Schema(
     },
     password: {
       type: String,
+    },
+    country: {
+      type: String,
+    },
+    phone: {
+      type: String,
+    },
+    street: {
+      type: String,
+    },
+    city: {
+      type: String,
+    },
+    district: {
+      type: String,
+    },
+    state: {
+      type: String,
+    },
+    pincode: {
+      type: Number,
     },
   },
   { timestamps: true }

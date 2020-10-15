@@ -6,8 +6,8 @@ module.exports = {
   NODE_ENV: 'production',
   SMTP_HOST: 'smtp.gmail.com',
   SMTP_PORT: '587',
-  SMTP_EMAIL: 'mujconvocation@gmail.com',
-  FROM_EMAIL: 'mujconvocation@gmail.com',
+  SMTP_EMAIL: 'manipalconvocation@gmail.com',
+  FROM_EMAIL: 'manipalconvocation@gmail.com',
   FROM_NAME: 'MUJ Convocation',
   SMTP_PASSWORD: 'utfdklvylvdaufgj',
 };

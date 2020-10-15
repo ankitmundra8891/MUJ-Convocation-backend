@@ -4,6 +4,8 @@ const asyncHandler = require('../middleware/async');
 const Student = require('../model/student');
 const crypto = require('crypto');
 const sendEmail = require('../utils/sendEmail');
+const bcrypt = require('bcryptjs');
+const Due = require('../model/due');
 const { JWT_COOKIE_EXPIRE } = require('../config/dev');
 
 // @desc register user
@@ -13,24 +15,34 @@ const { JWT_COOKIE_EXPIRE } = require('../config/dev');
 module.exports.registerUser = asyncHandler(async (req, res, next) => {
   const { reg_no } = req.body;
   const user = await Student.findOne({ reg_no });
-  const genreatedPassword = crypto.randomBytes(8).toString('hex');
+  if (!user) {
+    next(new ErrorResponse('No student found', 404));
+  }
+  if (user && user.password) {
+    next(new ErrorResponse('You have already registered, please login', 404));
+  } else {
+    const genreatedPassword = crypto.randomBytes(8).toString('hex');
 
-  const salt = await bcrypt.genSalt(10);
-  user.password = await bcrypt.hash(genreatedPassword, salt);
-  const message = `Your password for login is ${genreatedPassword}`;
-  await sendEmail({
-    email: user.email,
-    subject: 'Your password',
-    message,
-  });
+    const salt = await bcrypt.genSalt(10);
+    user.password = await bcrypt.hash(genreatedPassword, salt);
+
+    await user.save();
+
+    const message = `Your password for login is ${genreatedPassword}`;
+    await sendEmail({
+      email: user.email,
+      subject: 'Your password',
+      message,
+    });
+    sendTokenResponse(user, 200, res);
+  }
+
   // const user = await User.create({
   //   name,
   //   email,
   //   password,
   //   role,
   // });
-
-  sendTokenResponse(user, 200, res);
 });
 
 // @desc register user
@@ -38,33 +50,64 @@ module.exports.registerUser = asyncHandler(async (req, res, next) => {
 // @access PUBLIC
 
 module.exports.loginUser = asyncHandler(async (req, res, next) => {
-  const { reg_no, password } = req.body;
-  // Validate regNo & password
-  if (!reg_no || !password) {
-    return next(new ErrorResponse('Please provide an email and password', 400));
+  try {
+    const { reg_no, password } = req.body;
+    // Validate regNo & password
+    if (!reg_no || !password) {
+      return next(
+        new ErrorResponse('Please provide an reg_no and password', 400)
+      );
+    }
+
+    let user = await Student.findOne({
+      reg_no,
+    }).select('+password');
+
+    if (!user) {
+      return next(
+        new ErrorResponse('User does not exist or invalid credentials!', 401)
+      );
+    }
+
+    if (!user.password) {
+      return next(
+        new ErrorResponse('Please signup first to get your password!', 401)
+      );
+    }
+
+    // *
+
+    // Check if password matches
+    const isMatch = await user.matchPassword(password);
+
+    if (!isMatch) {
+      return next(new ErrorResponse('Invalid credentials', 401));
+    }
+    const due = await Due.find({ reg_no });
+    let message = `Please clear your dues for`;
+    for (d of due) {
+      message =
+        message + `\n${d.department} - Rs.${d.amount_due} - ${d.details}\n`;
+    }
+
+    if (due.length > 0) {
+      console.log(due);
+      await sendEmail({
+        email: user.email,
+        subject: 'Your dues',
+        message,
+      });
+      return next(
+        new ErrorResponse(
+          'Please clear your dues first,please check your mail for due details ',
+          401
+        )
+      );
+    }
+    sendTokenResponse(user, 200, res);
+  } catch (err) {
+    console.log(err);
   }
-
-  let user = await Student.findOne({
-    reg_No,
-  }).select('+password');
-
-  if (!user) {
-    return next(
-      new ErrorResponse('User does not exist or invalid credentials!', 401)
-    );
-  }
-  if (!user.password) {
-    return next(new ErrorResponse('Please signup first!', 401));
-  }
-
-  // Check if password matches
-  const isMatch = await user.matchPassword(password);
-
-  if (!isMatch) {
-    return next(new ErrorResponse('Invalid credentials', 401));
-  }
-
-  sendTokenResponse(user, 200, res);
 });
 
 // @desc get user after login
@@ -75,6 +118,20 @@ exports.getUserAfterLogin = asyncHandler(async (req, res, next) => {
   // getting user based on id of jwt token from header and as we don't want password we neglect it  using select('-password')
   let user = await Student.findById(req.user._id).select('-password');
 
+  if (!user) {
+    next(new ErrorResponse('User not found!', 404));
+  }
+  res.status(200).json({ success: true, data: user });
+});
+
+// @desc      add communication data
+// @route     post /auth/add-communication-data
+// @access    Private
+exports.addCommunicationData = asyncHandler(async (req, res, next) => {
+  const user = await Student.findByIdAndUpdate(req.user._id, req.body, {
+    new: true,
+    runValidators: true,
+  });
   if (!user) {
     next(new ErrorResponse('User not found!', 404));
   }

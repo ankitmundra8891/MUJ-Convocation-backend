@@ -17,7 +17,7 @@ const sendEmail = async (options) => {
 
     host: SMTP_HOST,
     port: SMTP_PORT,
-    secure: true,
+    secure: false,
     auth: {
       user: SMTP_EMAIL,
       pass: SMTP_PASSWORD,

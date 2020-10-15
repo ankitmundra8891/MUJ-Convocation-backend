@@ -73,14 +73,14 @@ app.use('/due', dueRoute);
 // app.use('/nopandata', noPanDataRoutes);
 // app.use('/images', express.static('images'));
 
-//Handling error and response
-app.use((error, req, res, next) => {
-  console.log(error);
-  const status = error.statusCode || 500;
-  const message = error.message;
-  const data = error.data;
-  res.status(status).json({ message: message, data: data });
-});
+// //Handling error and response
+// app.use((error, req, res, next) => {
+//   console.log(error);
+//   const status = error.statusCode || 500;
+//   const message = error.message;
+//   const data = error.data;
+//   res.status(status).json({ message: message, data: data });
+// });
 
 app.use(errorHandler);
 //Mongoose connection
